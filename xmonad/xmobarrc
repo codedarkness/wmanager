@@ -1,0 +1,71 @@
+-- http://projects.haskell.org/xmobar/
+-- install xmobar with these flags: --flags="with_alsa" --flags="with_mpd" --flags="with_xft"  OR --flags="all_extensions"
+-- you can find weather location codes here: http://weather.noaa.gov/index.html
+
+Config { font    = "xft:Noto:pixelsize=13:antialias=true:hinting=true"
+       , additionalFonts = [ "xft:Mononoki Nerd Font:pixelsize=11:antialias=true:hinting=true"
+                           , "xft:Mononoki Nerd Font:pixelsize=16:antialias=true:hinting=true"
+                           , "xft:FontAwesome:pixelsize=13"
+                           ]
+       , bgColor = "#222D31"
+       , fgColor = "#556064"
+       , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 24 }
+       , lowerOnStart = True
+       , textOffset = 17
+       , hideOnStart = False
+       , allDesktops = True
+       , persistent = True
+       , iconRoot = "./.config/xmobar/"  -- default: "."
+       , commands = [
+                      -- Time and date
+                      Run Date "%b %d %Y %H:%M" "date" 50
+
+                      -- Cpu usage in percent
+                    , Run Cpu [ "-t", "CPU <total>%"
+                              , "-H", "80"
+                              , "--high","red"
+                              ] 10
+
+                     -- cpu core temperature monitor
+                    , Run CoreTemp       [ "--template" , "TEM <core0>°C"
+                                         , "--High"     , "80"        -- units: °C
+                                         , "--high"     , "darkred"
+                                         ] 10
+
+                    -- Multi core temperature
+                    , Run MultiCoreTemp [ "-t", "TEM <avg>°C"
+                                        , "-H", "80"
+                                        , "-h", "darkred"
+                                        ] 50
+
+                     -- Ram used number and percent
+                    , Run Memory ["-t", "MEM <used>M"] 20
+
+                      -- Disk space free
+                    , Run DiskU [("/", "SSD <free>")] [] 60
+
+                    -- battery monitor
+                    , Run Battery        [ "--template" , "BAT <acstatus>"
+                                         , "--Low"      , "10"        -- units: %
+                                         , "--High"     , "80"        -- units: %
+                                         , "--low"      , "darkred"
+
+                                         , "--" -- battery specific options
+                                          -- discharging status
+                                         , "-o"	        , "<left>% (<timeleft>)"
+                                          -- AC "on" status
+                                         , "-O"	        , "Charging"
+                                         -- charged status
+                                         , "-i"	        , "Charged"
+                                         ] 50
+
+                    -- Volume (alsamixer)
+                    , Run Volume "default" "Master" [ "--template" , "VOL <volume>" ] 10
+
+                      -- The workspaces are 'clickable' in my configs.
+                    , Run UnsafeStdinReader
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "  <icon=haskell_20.xpm/>  %UnsafeStdinReader% }{ <fc=#AF6015>%cpu%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#5DADE2>%multicoretemp%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#D7BDE2>%memory%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#7FC6B6>%disku%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#E1ACFF>%battery%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#E59866>%default:Master%</fc> <fc=#666666><fn=2> . </fn></fc> <fc=#81A1C1>%date%  </fc>"
+       }
